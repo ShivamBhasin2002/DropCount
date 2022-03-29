@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/EntryPage.dart';
-import 'screens/AboutPage.dart';
-import 'screens/NotConnectedPage.dart';
-import 'screens/Settings.dart';
-import 'screens/LoginPage.dart';
-import 'screens/splasScreen.dart';
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +34,6 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(type: MaterialType.transparency, child: SplashScreen());
+    return const Material(type: MaterialType.transparency, child: SplashScreen());
   }
 }
