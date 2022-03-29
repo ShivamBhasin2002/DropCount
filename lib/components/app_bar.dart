@@ -1,4 +1,4 @@
-import 'package:dropcount/screens/AboutPage.dart';
+import 'package:dropcount/screens/about_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +15,7 @@ class AppNavbar extends StatelessWidget with PreferredSizeWidget {
             children: [
               Row(
                 children: [
-                  FlatButton(
+                  TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -44,7 +44,7 @@ class AppNavbar extends StatelessWidget with PreferredSizeWidget {
                       ])),
                   const Spacer(),
                   Container(
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                         border: Border.all(
                             color: const Color.fromARGB(255, 220, 220, 220)),

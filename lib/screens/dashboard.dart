@@ -2,9 +2,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../components/AppBar.dart';
+import '../components/app_bar.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import './Settings.dart';
+import 'settings.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _DashboardState extends State<Dashboard> {
     return PageView(children: [
       SafeArea(
           child: Scaffold(
-              appBar: AppNavbar(),
+              appBar: const AppNavbar(),
               body: SingleChildScrollView(
                   child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -77,7 +77,7 @@ class _DashboardState extends State<Dashboard> {
                                 color: Colors.grey.withOpacity(0.1),
                                 spreadRadius: 2,
                                 blurRadius: 3,
-                                offset: Offset(0, 3))
+                                offset: const Offset(0, 3))
                           ]),
                       alignment: Alignment.centerLeft,
                       child: Row(
@@ -126,7 +126,7 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     Container(
-                        margin: EdgeInsets.symmetric(vertical: 10.0),
+                        margin: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: const Color.fromRGBO(245, 245, 245, 1.0),
@@ -136,9 +136,9 @@ class _DashboardState extends State<Dashboard> {
                             child: TabBar(
                                 indicatorColor: Colors.transparent,
                                 unselectedLabelColor:
-                                    Color.fromRGBO(177, 176, 190, 1),
+                                    const Color.fromRGBO(177, 176, 190, 1),
                                 indicator: BoxDecoration(
-                                    color: Color.fromRGBO(55, 163, 241, 1),
+                                    color: const Color.fromRGBO(55, 163, 241, 1),
                                     borderRadius: BorderRadius.circular(20)),
                                 tabs: [
                                   Tab(
@@ -169,7 +169,7 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               )))),
-      Settings()
+      const Settings()
     ]);
   }
 }
