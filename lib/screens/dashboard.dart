@@ -5,31 +5,35 @@ import 'package:google_fonts/google_fonts.dart';
 import '../components/app_bar.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'settings.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
   @override
   State<Dashboard> createState() => _DashboardState();
 }
 
+void get_data() {
+  var data;
+  Future fetchdata() async {
+  final response = await http
+      .get(Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
+
+  if (response.statusCode == 200) {
+    data = jsonDecode(response.body);
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
+fetchdata();
+}
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
-  final data = {
-    "01-01-1970": 0,
-    "12-3-22": 65,
-    "13-3-22": 56,
-    "14-3-22": 45,
-    "15-3-22": 56,
-    "16-3-22": 32,
-    "17-3-22": 22,
-    "18-3-22": 10,
-    "19-3-22": 15,
-    "25-03-2022": 0,
-    "26-03-2022": 4312
-  };
   final _waterSaved = 30;
   @override
   Widget build(BuildContext context) {
+    get_data();
     return PageView(children: [
       SafeArea(
           child: Scaffold(
@@ -165,7 +169,8 @@ class _DashboardState extends State<Dashboard> {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700)),
                                   )),
-                                ]))),
+                                ])
+                                )),
                   ],
                 ),
               )))),
