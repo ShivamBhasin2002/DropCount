@@ -4,13 +4,17 @@ import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      name: 'drop-count',
       options: const FirebaseOptions(
           apiKey: 'AIzaSyDuA9HjVgpAM7-os84C0--u4tNlq7yjGko',
           appId: '1:953974172838:android:a0f33736f2d459efcbd867',
           messagingSenderId: '953974172838',
           projectId: 'drop-count',
-          authDomain: 'drop-count.firebaseapp.com'));
+          authDomain: 'drop-count.firebaseapp.com')
+  );
+}
   runApp(const MyApp());
 }
 
