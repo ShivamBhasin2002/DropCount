@@ -1,5 +1,4 @@
-// ignore: file_names
-import 'dart:developer';
+import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,29 +15,9 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-void get_data() {
-  print("Called");
-  var data;
-  Future fetchdata() async {
-    final response = await http.get(
-        Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
-
-    if (response.statusCode == 200) {
-      data = jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
-
-  fetchdata().then((value) => print("This is the DATA ==>>" + data.toString()));
-  print(data);
-}
-
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
-
-  final _waterSaved = 30;
-  var data, isSelected = [true, false, false];
+  var data, isSelected = [true, false, false], avgWaterUsage = 150;
 
   Future retrieveData() async {
     final response = await http.get(
@@ -51,6 +30,37 @@ class _DashboardState extends State<Dashboard> {
     } else {
       throw Exception('Failed to load data');
     }
+  }
+
+  double waterUsed() {
+    if (data != null) {
+      int total = 0;
+      if (isSelected[0]) {
+        return (((data != null)
+                ? data[DateFormat('dd-MM-yyyy').format(DateTime.now())]
+                : 0) /
+            1000);
+      } else if (isSelected[1]) {
+        for (var i = 0; i < 7; i++) {
+          total = total +
+              int.parse(((data != null)
+                  ? data[DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().subtract(Duration(days: i)))]
+                  : 0));
+        }
+        return total / 1000;
+      } else if (isSelected[2]) {
+        for (var i = 0; i < 30; i++) {
+          total = total +
+              int.parse(((data != null)
+                  ? data[DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().subtract(Duration(days: i)))]
+                  : 0));
+        }
+        return total / 1000;
+      }
+    }
+    return 0;
   }
 
   @override
@@ -117,9 +127,6 @@ class _DashboardState extends State<Dashboard> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text((data != null)
-                                  ? data.keys.toList()[0].toString()
-                                  : ""),
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -133,7 +140,9 @@ class _DashboardState extends State<Dashboard> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   'You saved water for ' +
-                                      (_waterSaved / 40).ceil().toString() +
+                                      (waterUsed() / avgWaterUsage)
+                                          .ceil()
+                                          .toString() +
                                       ' houses',
                                   style: GoogleFonts.roboto(
                                       fontSize: 14,
@@ -146,9 +155,9 @@ class _DashboardState extends State<Dashboard> {
                           CircularPercentIndicator(
                             radius: 40.0,
                             lineWidth: 5.0,
-                            percent: _waterSaved / 40,
+                            percent: waterUsed() / avgWaterUsage,
                             center: Text(
-                              _waterSaved.toString() + "%",
+                              20.toString() + "%",
                               style: GoogleFonts.roboto(
                                   fontSize: 20, fontWeight: FontWeight.w700),
                             ),
@@ -175,13 +184,13 @@ class _DashboardState extends State<Dashboard> {
                           ),
                           Container(
                             alignment: Alignment.center,
-                            child: Text('Monthly',
+                            child: Text('Weekly',
                                 style: GoogleFonts.roboto(
                                     fontSize: 14, fontWeight: FontWeight.w700)),
                           ),
                           Container(
                             alignment: Alignment.center,
-                            child: Text('Weekly',
+                            child: Text('Monthly',
                                 style: GoogleFonts.roboto(
                                     fontSize: 14, fontWeight: FontWeight.w700)),
                           ),
@@ -210,6 +219,33 @@ class _DashboardState extends State<Dashboard> {
                         isSelected: isSelected,
                       ),
                     ),
+                    Container(
+                      height: 20,
+                    ),
+                    CircularPercentIndicator(
+                      radius: (MediaQuery.of(context).size.width / 2) - 20,
+                      lineWidth: 15.0,
+                      percent: waterUsed() / avgWaterUsage,
+                      center: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/dashboardDrop.png',
+                            ),
+                            Container(height: 20),
+                            Text(
+                              waterUsed().toStringAsFixed(2) + ' L',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 40, fontWeight: FontWeight.w700),
+                            )
+                          ]),
+                      progressColor: (waterUsed() / avgWaterUsage > 0.80)
+                          ? Colors.red
+                          : (waterUsed() / avgWaterUsage > 0.50)
+                              ? Colors.yellow
+                              : const Color.fromRGBO(108, 229, 232, 1.0),
+                      backgroundColor: Colors.grey.withOpacity(0.2),
+                    )
                   ],
                 ),
               )))),
