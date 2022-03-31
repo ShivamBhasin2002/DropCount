@@ -1,5 +1,5 @@
 // ignore_for_file: unnecessary_new
-
+import 'package:dropcount/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,28 +32,27 @@ class Settings extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    // InkWell(
-                                    //   onTap: () => {},
-                                    //   child: Text(
-                                    //     '<',
-                                    //     textAlign: TextAlign.justify,
-                                    //     style: GoogleFonts.lato(
-                                    //       fontSize: 16,
-                                    //       fontWeight: FontWeight.w400,
-                                    //       color: Color.fromRGBO(65, 65, 65, 1),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 20),
-                                      child: Text(
-                                        '<',
-                                        textAlign: TextAlign.justify,
-                                        style: GoogleFonts.lato(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w900,
-                                          color: const Color.fromRGBO(
-                                              65, 65, 65, 1),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Dashboard()),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 20),
+                                        child: Text(
+                                          '<',
+                                          textAlign: TextAlign.justify,
+                                          style: GoogleFonts.lato(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.w900,
+                                            color: const Color.fromRGBO(
+                                                65, 65, 65, 1),
+                                          ),
                                         ),
                                       ),
                                     ),
