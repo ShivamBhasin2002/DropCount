@@ -2,8 +2,8 @@
     package="com.example.flutter_application_1">
     
    <application
-        android:label="flutter_application_1"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Drop Count"
+        android:icon="@mipmap/icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

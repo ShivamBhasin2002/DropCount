@@ -24,7 +24,7 @@ class _RewardsState extends State<Rewards> {
                       Row(children: [
                         Image.asset('assets/images/userIcon.png'),
                         Container(
-                            margin: EdgeInsets.only(left: 20),
+                            margin: const EdgeInsets.only(left: 20),
                             height: 70,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

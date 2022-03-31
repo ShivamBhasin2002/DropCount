@@ -17,6 +17,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
+  // ignore: prefer_typing_uninitialized_variables
   var data,
       isSelected = [true, false, false],
       avgWaterUsage = 150,
@@ -63,19 +64,26 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     retrieveData();
+    // ignore: constant_identifier_names
+    const Seconds = Duration(seconds: 15);
+    Timer.periodic(Seconds, (Timer t) => retrieveData());
   }
 
   @override
   Widget build(BuildContext context) {
-    var percentage =
-            waterUsed() / (tankLimit * [1, 7, 30][isSelected.indexOf(true)]),
-        temp = DateFormat('HH mm').format(DateTime.now()).split(' '),
-        waterUsagePercentage = (data != null)
-            ? data[DateFormat('dd-MM-yyyy').format(DateTime.now())] /
-                (1000 *
-                    ((int.parse(temp[0]) * 60 + int.parse(temp[1])) *
-                        (avgWaterUsage / (24 * 60))))
-            : 0;
+    var isOk = false;
+    var percentage = waterUsed() / (tankLimit * [1, 7, 30][isSelected.indexOf(true)]);
+    var currentUsage = data[DateFormat('dd-MM-yyyy').format(DateTime.now())] / 1000;
+    // ignore: prefer_typing_uninitialized_variables
+    var safePercentage;
+    if(currentUsage < avgWaterUsage) {
+      safePercentage = 1 - (currentUsage / avgWaterUsage);
+      isOk = true;
+    } else {
+      safePercentage = avgWaterUsage / currentUsage;
+      isOk = false;
+    }
+        
     return PageView(children: [
       SafeArea(
           child: Scaffold(
@@ -88,20 +96,11 @@ class _DashboardState extends State<Dashboard> {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(4),
-                      alignment: Alignment.center,
+                      margin: const EdgeInsets.only(left: 10),
                       child: Text(
-                        'Good Morning',
+                        'Welcome, ' + _username!.displayName.toString(),
                         style: GoogleFonts.roboto(
                             fontSize: 32, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      alignment: Alignment.center,
-                      child: Text(
-                        _username!.displayName.toString(),
-                        style: GoogleFonts.roboto(
-                            fontSize: 28, fontWeight: FontWeight.w400),
                       ),
                     ),
                     Container(
@@ -135,7 +134,7 @@ class _DashboardState extends State<Dashboard> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  'Great !',
+                                  isOk?'Great!':'Bad :(',
                                   style: GoogleFonts.roboto(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w700),
@@ -144,7 +143,11 @@ class _DashboardState extends State<Dashboard> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  'You saved water for ' +
+                                  isOk?'You saved water for ' +
+                                      (waterUsed() / avgWaterUsage)
+                                          .ceil()
+                                          .toString() +
+                                      ' houses' : 'You wasted water for ' +
                                       (waterUsed() / avgWaterUsage)
                                           .ceil()
                                           .toString() +
@@ -160,25 +163,19 @@ class _DashboardState extends State<Dashboard> {
                           CircularPercentIndicator(
                             radius: 40.0,
                             lineWidth: 5.0,
-                            percent: (waterUsagePercentage > 1)
-                                ? (waterUsagePercentage -
-                                    waterUsagePercentage.floor())
-                                : (1 - waterUsagePercentage),
+                            percent: double.parse(safePercentage.toString()),
                             center: Text(
-                              (((waterUsagePercentage > 1)
-                                              ? (waterUsagePercentage - 1)
-                                              : (1 - waterUsagePercentage)) *
-                                          100)
+                             (safePercentage * 100)
                                       .toStringAsFixed(0) +
                                   '%',
                               style: GoogleFonts.roboto(
-                                  color: (waterUsagePercentage >= 1)
+                                  color: (!isOk)
                                       ? Colors.red
                                       : Colors.green,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700),
                             ),
-                            progressColor: (waterUsagePercentage >= 1)
+                            progressColor: (!isOk)
                                 ? Colors.red
                                 : Colors.green,
                             backgroundColor: Colors.grey.withOpacity(0.2),
@@ -186,6 +183,11 @@ class _DashboardState extends State<Dashboard> {
                         ],
                       ),
                     ),
+                    Container(margin: const EdgeInsets.symmetric(vertical: 10.0),
+                      alignment: Alignment.center,
+                      child: Text(isOk?"":"Please turn off the tap while not in use", style: GoogleFonts.roboto(
+                                   color: Colors.green ,fontSize: 14, fontWeight: FontWeight.w700))
+                      ),
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
@@ -241,7 +243,7 @@ class _DashboardState extends State<Dashboard> {
                       height: 20,
                     ),
                     CircularPercentIndicator(
-                      radius: (MediaQuery.of(context).size.width / 2) - 20,
+                      radius: 168,
                       lineWidth: 15.0,
                       percent: (percentage > 1) ? 1 : percentage,
                       center: Column(
@@ -259,9 +261,9 @@ class _DashboardState extends State<Dashboard> {
                                   fontWeight: FontWeight.w700),
                             )
                           ]),
-                      progressColor: (percentage > avgWaterUsage / tankLimit)
+                      progressColor: (percentage > 0.80)
                           ? Colors.red
-                          : (percentage > 0.50)
+                          : (percentage > avgWaterUsage / tankLimit)
                               ? Colors.yellow
                               : const Color.fromRGBO(108, 229, 232, 1.0),
                       backgroundColor: Colors.grey.withOpacity(0.2),
@@ -269,7 +271,7 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               )))),
-      Rewards()
+      const Rewards()
     ]);
   }
 }

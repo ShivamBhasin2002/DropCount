@@ -15,8 +15,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Authentication.initializeFirebase(context: context);
     Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginPage()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const LoginPage()));
     });
   }
 
