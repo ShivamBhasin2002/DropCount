@@ -1,4 +1,5 @@
 // ignore: file_names
+import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ class Dashboard extends StatefulWidget {
 }
 
 void get_data() {
+  print("Called");
   var data;
   Future fetchdata() async {
     final response = await http.get(
@@ -28,15 +30,37 @@ void get_data() {
     }
   }
 
-  fetchdata().then((value) => print(data));
+  fetchdata().then((value) => print("This is the DATA ==>>" + data.toString()));
+  print(data);
 }
 
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
+
   final _waterSaved = 30;
+  var data, isSelected = [true, false, false];
+
+  Future retrieveData() async {
+    final response = await http.get(
+        Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        data = jsonDecode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    retrieveData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    get_data();
     return PageView(children: [
       SafeArea(
           child: Scaffold(
@@ -93,6 +117,9 @@ class _DashboardState extends State<Dashboard> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text((data != null)
+                                  ? data.keys.toList()[0].toString()
+                                  : ""),
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -133,47 +160,56 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color.fromRGBO(245, 245, 245, 1.0),
-                        ),
-                        child: DefaultTabController(
-                            length: 3,
-                            child: TabBar(
-                                indicatorColor: Colors.transparent,
-                                unselectedLabelColor:
-                                    const Color.fromRGBO(177, 176, 190, 1),
-                                indicator: BoxDecoration(
-                                    color:
-                                        const Color.fromRGBO(55, 163, 241, 1),
-                                    borderRadius: BorderRadius.circular(20)),
-                                tabs: [
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Daily',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Weekly',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Monthly',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                ]))),
+                      margin: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromRGBO(245, 245, 245, 1.0),
+                      ),
+                      child: ToggleButtons(
+                        children: <Widget>[
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Daily',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Monthly',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Weekly',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                        ],
+                        selectedColor: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        constraints: BoxConstraints(
+                            minWidth:
+                                (MediaQuery.of(context).size.width - 36) / 3,
+                            minHeight: 40),
+                        fillColor: Colors.blue,
+                        highlightColor: Colors.white,
+                        onPressed: (int index) {
+                          setState(() {
+                            for (int buttonIndex = 0;
+                                buttonIndex < isSelected.length;
+                                buttonIndex++) {
+                              if (buttonIndex == index) {
+                                isSelected[buttonIndex] = true;
+                              } else {
+                                isSelected[buttonIndex] = false;
+                              }
+                            }
+                          });
+                        },
+                        isSelected: isSelected,
+                      ),
+                    ),
                   ],
                 ),
               )))),
