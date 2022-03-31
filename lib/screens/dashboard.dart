@@ -8,6 +8,7 @@ import 'settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
   @override
@@ -17,17 +18,19 @@ class Dashboard extends StatefulWidget {
 void get_data() {
   var data;
   Future fetchdata() async {
-  final response = await http
-      .get(Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
+    final response = await http.get(
+        Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
 
-  if (response.statusCode == 200) {
-    data = jsonDecode(response.body);
-  } else {
-    throw Exception('Failed to load data');
+    if (response.statusCode == 200) {
+      data = jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load data');
+    }
   }
+
+  fetchdata().then((value) => print(data));
 }
-fetchdata();
-}
+
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
   final _waterSaved = 30;
@@ -142,7 +145,8 @@ class _DashboardState extends State<Dashboard> {
                                 unselectedLabelColor:
                                     const Color.fromRGBO(177, 176, 190, 1),
                                 indicator: BoxDecoration(
-                                    color: const Color.fromRGBO(55, 163, 241, 1),
+                                    color:
+                                        const Color.fromRGBO(55, 163, 241, 1),
                                     borderRadius: BorderRadius.circular(20)),
                                 tabs: [
                                   Tab(
@@ -169,8 +173,7 @@ class _DashboardState extends State<Dashboard> {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700)),
                                   )),
-                                ])
-                                )),
+                                ]))),
                   ],
                 ),
               )))),
