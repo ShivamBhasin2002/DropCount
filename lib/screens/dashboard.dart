@@ -1,4 +1,4 @@
-// ignore: file_names
+import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,28 +15,62 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-void get_data() {
-  var data;
-  Future fetchdata() async {
+class _DashboardState extends State<Dashboard> {
+  final User? _username = FirebaseAuth.instance.currentUser;
+  var data, isSelected = [true, false, false], avgWaterUsage = 150;
+
+  Future retrieveData() async {
     final response = await http.get(
         Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
 
     if (response.statusCode == 200) {
-      data = jsonDecode(response.body);
+      setState(() {
+        data = jsonDecode(response.body);
+      });
     } else {
       throw Exception('Failed to load data');
     }
   }
 
-  fetchdata().then((value) => print(data));
-}
+  double waterUsed() {
+    if (data != null) {
+      int total = 0;
+      if (isSelected[0]) {
+        return (((data != null)
+                ? data[DateFormat('dd-MM-yyyy').format(DateTime.now())]
+                : 0) /
+            1000);
+      } else if (isSelected[1]) {
+        for (var i = 0; i < 7; i++) {
+          total = total +
+              int.parse(((data != null)
+                  ? data[DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().subtract(Duration(days: i)))]
+                  : 0));
+        }
+        return total / 1000;
+      } else if (isSelected[2]) {
+        for (var i = 0; i < 30; i++) {
+          total = total +
+              int.parse(((data != null)
+                  ? data[DateFormat('dd-MM-yyyy')
+                      .format(DateTime.now().subtract(Duration(days: i)))]
+                  : 0));
+        }
+        return total / 1000;
+      }
+    }
+    return 0;
+  }
 
-class _DashboardState extends State<Dashboard> {
-  final User? _username = FirebaseAuth.instance.currentUser;
-  final _waterSaved = 30;
+  @override
+  void initState() {
+    super.initState();
+    retrieveData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    get_data();
     return PageView(children: [
       SafeArea(
           child: Scaffold(
@@ -106,7 +140,9 @@ class _DashboardState extends State<Dashboard> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   'You saved water for ' +
-                                      (_waterSaved / 40).ceil().toString() +
+                                      (waterUsed() / avgWaterUsage)
+                                          .ceil()
+                                          .toString() +
                                       ' houses',
                                   style: GoogleFonts.roboto(
                                       fontSize: 14,
@@ -119,9 +155,9 @@ class _DashboardState extends State<Dashboard> {
                           CircularPercentIndicator(
                             radius: 40.0,
                             lineWidth: 5.0,
-                            percent: _waterSaved / 40,
+                            percent: waterUsed() / avgWaterUsage,
                             center: Text(
-                              _waterSaved.toString() + "%",
+                              20.toString() + "%",
                               style: GoogleFonts.roboto(
                                   fontSize: 20, fontWeight: FontWeight.w700),
                             ),
@@ -133,47 +169,83 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color.fromRGBO(245, 245, 245, 1.0),
-                        ),
-                        child: DefaultTabController(
-                            length: 3,
-                            child: TabBar(
-                                indicatorColor: Colors.transparent,
-                                unselectedLabelColor:
-                                    const Color.fromRGBO(177, 176, 190, 1),
-                                indicator: BoxDecoration(
-                                    color:
-                                        const Color.fromRGBO(55, 163, 241, 1),
-                                    borderRadius: BorderRadius.circular(20)),
-                                tabs: [
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Daily',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Weekly',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                  Tab(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Text('Monthly',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700)),
-                                  )),
-                                ]))),
+                      margin: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromRGBO(245, 245, 245, 1.0),
+                      ),
+                      child: ToggleButtons(
+                        children: <Widget>[
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Daily',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Weekly',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            child: Text('Monthly',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 14, fontWeight: FontWeight.w700)),
+                          ),
+                        ],
+                        selectedColor: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        constraints: BoxConstraints(
+                            minWidth:
+                                (MediaQuery.of(context).size.width - 36) / 3,
+                            minHeight: 40),
+                        fillColor: Colors.blue,
+                        highlightColor: Colors.white,
+                        onPressed: (int index) {
+                          setState(() {
+                            for (int buttonIndex = 0;
+                                buttonIndex < isSelected.length;
+                                buttonIndex++) {
+                              if (buttonIndex == index) {
+                                isSelected[buttonIndex] = true;
+                              } else {
+                                isSelected[buttonIndex] = false;
+                              }
+                            }
+                          });
+                        },
+                        isSelected: isSelected,
+                      ),
+                    ),
+                    Container(
+                      height: 20,
+                    ),
+                    CircularPercentIndicator(
+                      radius: (MediaQuery.of(context).size.width / 2) - 20,
+                      lineWidth: 15.0,
+                      percent: waterUsed() / avgWaterUsage,
+                      center: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/dashboardDrop.png',
+                            ),
+                            Container(height: 20),
+                            Text(
+                              waterUsed().toStringAsFixed(2) + ' L',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 40, fontWeight: FontWeight.w700),
+                            )
+                          ]),
+                      progressColor: (waterUsed() / avgWaterUsage > 0.80)
+                          ? Colors.red
+                          : (waterUsed() / avgWaterUsage > 0.50)
+                              ? Colors.yellow
+                              : const Color.fromRGBO(108, 229, 232, 1.0),
+                      backgroundColor: Colors.grey.withOpacity(0.2),
+                    )
                   ],
                 ),
               )))),
