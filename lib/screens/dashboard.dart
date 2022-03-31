@@ -17,7 +17,10 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   final User? _username = FirebaseAuth.instance.currentUser;
-  var data, isSelected = [true, false, false], avgWaterUsage = 150;
+  var data,
+      isSelected = [true, false, false],
+      avgWaterUsage = 150,
+      tankLimit = 500;
   Future retrieveData() async {
     final response = await http.get(
         Uri.parse('https://drop-count-default-rtdb.firebaseio.com/test.json'));
@@ -64,12 +67,14 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    var percentage = waterUsed() /
-            (avgWaterUsage * [1, 7, 30][isSelected.indexOf(true)]),
+    var percentage =
+            waterUsed() / (tankLimit * [1, 7, 30][isSelected.indexOf(true)]),
         temp = DateFormat('HH mm').format(DateTime.now()).split(' '),
         waterUsagePercentage = (data != null)
             ? data[DateFormat('dd-MM-yyyy').format(DateTime.now())] /
-                ((int.parse(temp[0]) * 60 + int.parse(temp[1])) * 104)
+                (1000 *
+                    ((int.parse(temp[0]) * 60 + int.parse(temp[1])) *
+                        (avgWaterUsage / (24 * 60))))
             : 0;
     return PageView(children: [
       SafeArea(
@@ -160,14 +165,22 @@ class _DashboardState extends State<Dashboard> {
                                     waterUsagePercentage.floor())
                                 : (1 - waterUsagePercentage),
                             center: Text(
-                              ((1 - waterUsagePercentage) * 100)
+                              (((waterUsagePercentage > 1)
+                                              ? (waterUsagePercentage - 1)
+                                              : (1 - waterUsagePercentage)) *
+                                          100)
                                       .toStringAsFixed(0) +
                                   '%',
                               style: GoogleFonts.roboto(
-                                  fontSize: 20, fontWeight: FontWeight.w700),
+                                  color: (waterUsagePercentage >= 1)
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700),
                             ),
-                            progressColor:
-                                const Color.fromRGBO(108, 229, 232, 1.0),
+                            progressColor: (waterUsagePercentage >= 1)
+                                ? Colors.red
+                                : Colors.green,
                             backgroundColor: Colors.grey.withOpacity(0.2),
                           )
                         ],
@@ -241,10 +254,12 @@ class _DashboardState extends State<Dashboard> {
                             Text(
                               waterUsed().toStringAsFixed(2) + ' L',
                               style: GoogleFonts.roboto(
-                                  fontSize: 40, fontWeight: FontWeight.w700),
+                                  color: Colors.grey[800],
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w700),
                             )
                           ]),
-                      progressColor: (percentage > 0.80)
+                      progressColor: (percentage > avgWaterUsage / tankLimit)
                           ? Colors.red
                           : (percentage > 0.50)
                               ? Colors.yellow
