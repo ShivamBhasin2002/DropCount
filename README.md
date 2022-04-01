@@ -29,7 +29,9 @@ Water Usage Detector: This device consists of a water flow sensor and nodemcu. I
 Add the following to your `pubspec.yaml` file:
 
     dependencies:
+      google_fonts: ^2.2.0
       url_launcher: ^6.0.18
+      firebase_core: ^1.13.1
       firebase_auth: ^3.3.11
       google_sign_in: ^5.2.4
       cupertino_icons: ^1.0.2
@@ -37,6 +39,10 @@ Add the following to your `pubspec.yaml` file:
       provider: ^6.0.2
       percent_indicator: ^4.0.0
       awesome_dropdown: ^0.0.4
+      firebase_database: ^9.0.8
+      firebase_database_web: ^0.2.0+7
+      http: ^0.13.4
+      intl: ^0.17.0
       
 ## Screenshots
 
