@@ -1,4 +1,4 @@
-import 'package:dropcount/screens/rewards.dart';
+import 'package:dropcount/screens/reward.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -72,18 +72,20 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     var isOk = false;
-    var percentage = waterUsed() / (tankLimit * [1, 7, 30][isSelected.indexOf(true)]);
-    var currentUsage = data[DateFormat('dd-MM-yyyy').format(DateTime.now())] / 1000;
+    var percentage =
+        waterUsed() / (tankLimit * [1, 7, 30][isSelected.indexOf(true)]);
+    var currentUsage =
+        data[DateFormat('dd-MM-yyyy').format(DateTime.now())] / 1000;
     // ignore: prefer_typing_uninitialized_variables
     var safePercentage;
-    if(currentUsage < avgWaterUsage) {
+    if (currentUsage < avgWaterUsage) {
       safePercentage = 1 - (currentUsage / avgWaterUsage);
       isOk = true;
     } else {
       safePercentage = avgWaterUsage / currentUsage;
       isOk = false;
     }
-        
+
     return PageView(children: [
       SafeArea(
           child: Scaffold(
@@ -134,7 +136,7 @@ class _DashboardState extends State<Dashboard> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  isOk?'Great!':'Bad :(',
+                                  isOk ? 'Great!' : 'Bad :(',
                                   style: GoogleFonts.roboto(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w700),
@@ -143,15 +145,17 @@ class _DashboardState extends State<Dashboard> {
                               Container(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  isOk?'You saved water for ' +
-                                      (waterUsed() / avgWaterUsage)
-                                          .ceil()
-                                          .toString() +
-                                      ' houses' : 'You wasted water for ' +
-                                      (waterUsed() / avgWaterUsage)
-                                          .ceil()
-                                          .toString() +
-                                      ' houses',
+                                  isOk
+                                      ? 'You saved water for ' +
+                                          (waterUsed() / avgWaterUsage)
+                                              .ceil()
+                                              .toString() +
+                                          ' houses'
+                                      : 'You wasted water for ' +
+                                          (waterUsed() / avgWaterUsage)
+                                              .ceil()
+                                              .toString() +
+                                          ' houses',
                                   style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400),
@@ -165,29 +169,29 @@ class _DashboardState extends State<Dashboard> {
                             lineWidth: 5.0,
                             percent: double.parse(safePercentage.toString()),
                             center: Text(
-                             (safePercentage * 100)
-                                      .toStringAsFixed(0) +
-                                  '%',
+                              (safePercentage * 100).toStringAsFixed(0) + '%',
                               style: GoogleFonts.roboto(
-                                  color: (!isOk)
-                                      ? Colors.red
-                                      : Colors.green,
+                                  color: (!isOk) ? Colors.red : Colors.green,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700),
                             ),
-                            progressColor: (!isOk)
-                                ? Colors.red
-                                : Colors.green,
+                            progressColor: (!isOk) ? Colors.red : Colors.green,
                             backgroundColor: Colors.grey.withOpacity(0.2),
                           )
                         ],
                       ),
                     ),
-                    Container(margin: const EdgeInsets.symmetric(vertical: 10.0),
-                      alignment: Alignment.center,
-                      child: Text(isOk?"":"Please turn off the tap while not in use", style: GoogleFonts.roboto(
-                                   color: Colors.green ,fontSize: 14, fontWeight: FontWeight.w700))
-                      ),
+                    Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10.0),
+                        alignment: Alignment.center,
+                        child: Text(
+                            isOk
+                                ? ""
+                                : "Please turn off the tap while not in use",
+                            style: GoogleFonts.roboto(
+                                color: Colors.green,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700))),
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
@@ -265,13 +269,13 @@ class _DashboardState extends State<Dashboard> {
                           ? Colors.red
                           : (percentage > avgWaterUsage / tankLimit)
                               ? Colors.yellow
-                              : const Color.fromRGBO(108, 229, 232, 1.0),
+                              : Colors.blue,
                       backgroundColor: Colors.grey.withOpacity(0.2),
                     )
                   ],
                 ),
               )))),
-      const Rewards()
+      Rewards()
     ]);
   }
 }
