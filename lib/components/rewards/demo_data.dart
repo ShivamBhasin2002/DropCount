@@ -1,17 +1,17 @@
-class DrinkData {
-  final String title;
-  final int requiredPoints;
+class CouponData {
+  final String couponTitle;
+  final int streakPoints;
 
-  DrinkData(this.title, this.requiredPoints);
+  CouponData(this.couponTitle, this.streakPoints);
 }
 
 class DemoData {
-  int earnedPoints = 150;
-  List<DrinkData> drinks = [
-    DrinkData("Coffee", 100),
-    DrinkData("Tea", 150),
-    DrinkData("Latte", 250),
-    DrinkData("Frappuccino", 350),
-    DrinkData("Pressed Juice", 450),
+  int streak = 150;
+  List<CouponData> drinks = [
+    CouponData("Google Play", 100),
+    CouponData("PUBG", 150),
+    CouponData("MPL", 250),
+    CouponData("Firebase Credits", 350),
+    CouponData("GCP", 450),
   ];
 }

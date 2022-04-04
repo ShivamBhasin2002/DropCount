@@ -2,10 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../components/rewards/syles.dart';
+import '../components/rewards/styles.dart';
 import '../components/rewards/demo_data.dart';
 import '../components/rewards/rounded_shadow.dart';
-import '../components/rewards/drink_card.dart';
+import '../components/rewards/coupon_card.dart';
 
 class Rewards extends StatefulWidget {
   @override
@@ -14,16 +14,16 @@ class Rewards extends StatefulWidget {
 
 class _RewardsState extends State<Rewards> {
   double _listPadding = 20;
-  DrinkData? _selectedDrink;
+  CouponData? _selectedDrink;
   ScrollController _scrollController = ScrollController();
-  late List<DrinkData> _drinks;
+  late List<CouponData> _drinks;
   late int _earnedPoints;
 
   @override
   void initState() {
     var demoData = DemoData();
     _drinks = demoData.drinks;
-    _earnedPoints = demoData.earnedPoints;
+    _earnedPoints = demoData.streak;
     super.initState();
   }
 
@@ -57,11 +57,11 @@ class _RewardsState extends State<Rewards> {
     return Container(
       margin: EdgeInsets.symmetric(
           vertical: _listPadding / 2, horizontal: _listPadding),
-      child: DrinkListCard(
-        earnedPoints: _earnedPoints,
-        drinkData: _drinks[index],
-        isOpen: _drinks[index] == _selectedDrink,
-        onTap: _handleDrinkTapped,
+      child: CouponListCard(
+        streak: _earnedPoints,
+        couponData: _drinks[index],
+        isopen: _drinks[index] == _selectedDrink,
+        onClick: _handleDrinkTapped,
         key: Key(index.toString()),
       ),
     );
@@ -101,7 +101,7 @@ class _RewardsState extends State<Rewards> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(Icons.star,
-                      color: AppColors.redAccent, size: height * .2),
+                      color: AppColors.StarAccent, size: height * .2),
                   SizedBox(width: 8),
                   Text("$_earnedPoints",
                       style: Styles.text(height * .3, Colors.white, true)),
@@ -116,14 +116,14 @@ class _RewardsState extends State<Rewards> {
     );
   }
 
-  void _handleDrinkTapped(DrinkData data) {
+  void _handleDrinkTapped(CouponData data) {
     setState(() {
       if (_selectedDrink == data) {
         _selectedDrink = _drinks[0];
       } else {
         _selectedDrink = data;
         var selectedIndex = _drinks.indexOf(_selectedDrink ?? _drinks[0]);
-        var closedHeight = DrinkListCard.nominalHeightClosed;
+        var closedHeight = CouponListCard.heightClosed;
         var offset =
             selectedIndex * (closedHeight + _listPadding) - closedHeight * .35;
         _scrollController.animateTo(offset,
